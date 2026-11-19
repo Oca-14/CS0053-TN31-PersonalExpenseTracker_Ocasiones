@@ -1,4 +1,3 @@
-
 #include "file_manager.h"
 
 #include <iostream>
