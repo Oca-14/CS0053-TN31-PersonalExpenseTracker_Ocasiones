@@ -1,31 +1,42 @@
-
 #include "Expense.h"
 #include "Validation.h"
 
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 
 using namespace std;
 
 void addExpense(vector<Expense>& expenses) {
     Expense newExpense;
 
-    int nextId = 1;
+   int newID = 1;
 
-    for (const Expense& expense : expenses) {
-        if (expense.id >= nextId) {
-            nextId = expense.id + 1;
+    while (true) {
+        bool idExists = false;
+
+        for (const Expense& expense : expenses) {
+            if (expense.id == newID) {
+                idExists = true;
+                break;
+            }
         }
+
+        if (!idExists) {
+            break;
+        }
+
+        newID++;
     }
 
-    newExpense.id = nextId;
+    newExpense.id = newID;
 
     cout << "\n===== ADD EXPENSE =====\n";
 
     newExpense.name = readNonEmptyLine("Enter expense name: ");
     newExpense.category = readNonEmptyLine("Enter category: ");
     newExpense.amount = readPositiveDouble("Enter amount: ");
-    newExpense.date = readNonEmptyLine("Enter date (YYYY-MM-DD): ");
+    newExpense.date = readValidDate("Enter date (YYYY-MM-DD): ");
 
     expenses.push_back(newExpense);
 
@@ -34,31 +45,34 @@ void addExpense(vector<Expense>& expenses) {
 }
 
 void viewExpenses(const vector<Expense>& expenses) {
-    cout << "\n===== ALL EXPENSES =====\n";
-
     if (expenses.empty()) {
-        cout << "No expense records found.\n";
+        cout << "\nNo expenses found.\n";
         return;
     }
 
-    cout << left
-         << setw(8) << "ID"
+    vector<Expense> sortedExpenses = expenses;
+
+    sort(sortedExpenses.begin(), sortedExpenses.end(),
+         [](const Expense& a, const Expense& b) {
+             return a.id < b.id;
+         });
+
+    cout << "\n==================== EXPENSE RECORDS ====================\n";
+    cout << left << setw(5) << "ID"
          << setw(20) << "Name"
-         << setw(18) << "Category"
+         << setw(15) << "Category"
          << setw(12) << "Amount"
-         << setw(15) << "Date" << "\n";
+         << setw(12) << "Date" << "\n";
+    cout << "---------------------------------------------------------\n";
 
-    cout << string(73, '-') << "\n";
-
-    for (const Expense& expense : expenses) {
-        cout << left
-             << setw(8) << expense.id
+    for (const Expense& expense : sortedExpenses) {
+        cout << left << setw(5) << expense.id
              << setw(20) << expense.name
-             << setw(18) << expense.category
-             << fixed << setprecision(2)
-             << setw(12) << expense.amount
-             << setw(15) << expense.date << "\n";
+             << setw(15) << expense.category
+             << setw(12) << fixed << setprecision(2) << expense.amount
+             << setw(12) << expense.date << "\n";
     }
+    cout << "=========================================================\n";
 }
 
 void searchExpense(const vector<Expense>& expenses) {
@@ -104,7 +118,7 @@ void updateExpense(vector<Expense>& expenses) {
             expense.name = readNonEmptyLine("Enter new name: ");
             expense.category = readNonEmptyLine("Enter new category: ");
             expense.amount = readPositiveDouble("Enter new amount: ");
-            expense.date = readNonEmptyLine("Enter new date (YYYY-MM-DD): ");
+            expense.date = readValidDate("Enter date (YYYY-MM-DD): ");
 
             cout << "\nExpense updated successfully!\n";
             return;
