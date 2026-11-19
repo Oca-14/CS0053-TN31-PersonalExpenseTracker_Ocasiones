@@ -1,2 +1,5 @@
 1,Lunch,Food,150,2026-11-18
 2,Notebook,Education,85,2026-11-18
+4,Pen,Education,20,2026-02-28
+5,Ice cream,Food,20,2025-02-28
+3,Banana ,Food,50,2026-11-18
